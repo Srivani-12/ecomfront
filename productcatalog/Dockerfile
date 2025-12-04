@@ -1,6 +1,5 @@
 FROM jenkins/jenkins:2.528.2-lts
 
-
 USER root
 
 # Install required packages
@@ -11,7 +10,8 @@ RUN apt-get update && apt-get install -y \
     gnupg \
     lsb-release \
     python3 \
-    python3-pip
+    python3-pip \
+    sudo
 
 # Add Docker repo GPG key
 RUN curl -fsSL https://download.docker.com/linux/debian/gpg | \
@@ -25,7 +25,11 @@ RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/d
 # Install Docker CLI
 RUN apt-get update && apt-get install -y docker-ce-cli
 
+# Add Jenkins user to docker group
+RUN groupadd -g 999 docker || true \
+    && usermod -aG docker jenkins
+
 USER jenkins
 
 # Install Jenkins plugins
-RUN jenkins-plugin-cli --plugins "blueocean:1.25.3 docker-workflow:1.28"
+RUN jenkins-plugin-cli --plugins "blueocean:1.27.25 docker-workflow:634.vd4c7242b_eda_7"
